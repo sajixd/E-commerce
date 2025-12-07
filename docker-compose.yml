@@ -1,0 +1,42 @@
+version: '3.8'
+
+services:
+  # --- 1. Backend Service ---
+  backend:
+    build: 
+      context: ./server # Path to the server folder
+      dockerfile: Dockerfile
+    container_name: backend
+    ports:
+      - "5000:5000"
+    env_file:
+      - ./server/.env # Use environment variables from the .env file
+    depends_on:
+      - mongo
+
+  # --- 2. Frontend Service ---
+  frontend:
+    build:
+      context: ./client # Path to the client folder
+      dockerfile: Dockerfile
+    container_name: frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+
+  # --- 3. Database Service (MongoDB) ---
+  mongo:
+    image: mongo:latest
+    container_name: mongo
+    # We don't need to expose port 27017 to the outside world, 
+    # only the backend container needs to access it.
+    # But for development/debugging, you might temporarily open it:
+    # ports:
+    #   - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+    restart: always
+
+volumes:
+  mongo-data:
