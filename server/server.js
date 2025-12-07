@@ -16,11 +16,15 @@ connectDB().then(() => {
 
 const app = express();
 
-// --- CORS CONFIGURATION FIX START ---
-// 1. Tumhara Live Frontend URL
+// --- MIDDLEWARE ORDER FIX: Body Parser FIRST, then CORS ---
+// 1. Body parser middleware should be first to parse incoming requests
+app.use(express.json());
+
+// 2. CORS Configuration
+// Tumhara Live Frontend URL
 const allowedOrigin = 'https://e-commerce-0k1j.onrender.com'; 
 
-// 2. CORS Options, jo Frontend ko allow karega aur credentials (cookies) bhi accept karega
+// CORS Options, jo Frontend ko allow karega aur credentials (cookies) bhi accept karega
 const corsOptions = {
     origin: allowedOrigin,
     // Agar tum cookies ya sessions use karte ho, toh yeh zaroori hai
@@ -28,11 +32,9 @@ const corsOptions = {
     optionsSuccessStatus: 200
 };
 
-// 3. CORS middleware use karo specific options ke saath
+// CORS middleware use karo specific options ke saath
 app.use(cors(corsOptions)); 
-// --- CORS CONFIGURATION FIX END ---
-
-app.use(express.json()); // Body parser should be after CORS or before routes
+// --- MIDDLEWARE ORDER FIX END ---
 
 app.get('/', (req, res) => {
       res.send('API is running...');
